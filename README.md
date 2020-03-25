@@ -7,9 +7,9 @@ The current plugin is to make transactions using belugapay ecommerce api using w
 * PHP 7.2 >=
 * [Wordpress](https://es-mx.wordpress.org/download/) 5.3.2 >=
 * [WooCommerce](https://wordpress.org/plugins/woocommerce/) 3.8.1 >=
-* [Belugapay ecommerce](https://gitlab.com/belugapaydevs/belugapaybackend/checkout-gateway-woocommerce) API-KEY
+* [Belugapay ecommerce](https://dash.belugapay.com/login) API-KEY
 
-## [Tutorial](https://gitlab.com/belugapaydevs/belugapaybackend/belugapay-checkout-gateway-woocommerce/-/wikis/Documentation(ES)/Instalar-plugin)
+## [Tutorial](https://github.com/belugapaydevs/Ecommerce-Plugin-WooCommerce/wiki/Instalar-plugin)
 
 ## Authors
 
