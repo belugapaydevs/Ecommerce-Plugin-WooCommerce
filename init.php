@@ -1,7 +1,7 @@
 <?php
 /*
   Plugin Name: Belugapay Checkout Gateway for Woocommerce
-  Description: Payment gateway for credit and debit cards for visa or mastercard.
+  Description: Payment gateway for credit and debit cards of visa or mastercard type allowed in Mexico.
   Version: 0.0.1
   Author: Belugapay
   Author URI: https://belugapay.com/
@@ -59,6 +59,7 @@ function wc_belugapay_gateway_init() {
       $this->method_title       = __( 'Belugapay Card Payment', 'belugapaycardpayment' );
       $this->method_description = __( 'Allow payments by credit or debit card, visa or mastercard that are allowed in Mexican' );
       $this->enabled            = false;
+      $this->supports           = array( 'products', 'refunds' );
       
       // Load the settings.
       $this->init_form_fields();
@@ -180,11 +181,16 @@ function wc_belugapay_gateway_init() {
 
       $response = $sale->sale($cardHolder, $card, $address, $transaction, $metadata);
 
+      // file_put_contents(
+      //   'debugBelugapay.txt',
+      //   file_get_contents('debugBelugapay.txt') . json_encode($response)
+      // );
+
       if (
         !isset($response['codigo'])   ||
         $response['codigo'] !== 200   ||
         !isset($response['mensaje'])  ||
-        $response['mensaje'] === 'Declinada'
+        $response['mensaje'] !== 'Aprobada'
       ) {
         if (isset($response['message'])) {
           throw new Exception($response['message']);
@@ -198,11 +204,6 @@ function wc_belugapay_gateway_init() {
     function process_payment( $order_id ) {
       global $woocommerce;
       $order = new WC_Order( $order_id );
-
-      // file_put_contents(
-      //   'debugBelugapay.txt',
-      //   file_get_contents('debugBelugapay.txt') . json_encode($order->get_data()) . json_encode($_POST)
-      // );
 
       try {
         $response = $this->ecommerceTransaction($order_id, $order);
@@ -220,13 +221,13 @@ function wc_belugapay_gateway_init() {
             $response['data']['transaction']['reference'],
             $response['data']['transaction']['authCode']
           ));
+
+          // Return thankyou redirect
+          return array(
+            'result' => 'success',
+            'redirect' => $this->get_return_url( $order )
+          );
         }
-    
-        // Return thankyou redirect
-        return array(
-          'result' => 'success',
-          'redirect' => $this->get_return_url( $order )
-        );
       } catch (Exception $e) {
         global $wp_version;
 
@@ -240,6 +241,84 @@ function wc_belugapay_gateway_init() {
           "Error Transaction : '%s'",
           $e->getMessage()
         ));
+      }
+    }
+
+    function ecommerceTransactionRefund($order_id, $reference) {
+      /* Uncomment is only development */
+      // \BelugaPay\Environment::setEnvironment('develop');
+      // \BelugaPay\BelugaPay::init();
+
+      if ($this->enabledProduction === 'yes') {
+        \BelugaPay\User::setApiKey($this->productionApiKey);
+      } else {
+        \BelugaPay\User::setApiKey($this->sandboxApiKey);
+      }
+
+      $cancel = new \BelugaPay\Cancel();
+
+      $cancelTransaction = array(
+        'saleTransaction' => array (
+          'reference' => $reference
+        )
+      );
+
+      $response = $cancel->cancel($cancelTransaction);
+
+      if (
+        !isset($response['codigo'])   ||
+        $response['codigo'] !== 200   ||
+        !isset($response['mensaje'])  ||
+        $response['mensaje'] !== 'Aprobada'
+      ) {
+        if (isset($response['message'])) {
+          throw new Exception($response['message']);
+        }
+        throw new Exception('Error al realizar la cancelación');
+      }
+
+      return $response;
+    }
+
+    public function process_refund($order_id, $amount = null, $reason = '') {
+      $order = new WC_Order( $order_id );
+      $orderData = $order->get_data();
+      $reference = get_post_meta($order_id, 'reference', true);
+
+      if ($orderData['total']  !== $amount ) {
+        return new WP_Error( 'error', __( 'Error de cancelacion: El monto debe ser igual al monto de la orden.',
+					'wc-gateway-belugapay' ) );
+      }
+
+      try {
+        $response = $this->ecommerceTransactionRefund($order->get_id(), $reference);
+
+        if ($response) {
+
+          $order->add_order_note( sprintf(
+            "Cancellation: %s,<br/>Reference: %s,<br/>Authorization Code: %s",
+            $response['data']['transaction']['transactionId'],
+            $response['data']['transaction']['reference'],
+            $response['data']['transaction']['authCode']
+          ));
+
+          update_post_meta($order->get_id(), 'cancellationTransactionId', $response['data']['transaction']['transactionId']);
+          update_post_meta($order->get_id(), 'cancellationReference', $response['data']['transaction']['reference']);
+          update_post_meta($order->get_id(), 'cancellationAuthCode', $response['data']['transaction']['authCode']);
+    
+          return true;
+        }
+
+        return new WP_Error( 'error', __( 'Error al cancelar la transacción', 'wc-gateway-belugapay' ) );
+      } catch (Exception $e) {
+        global $wp_version;
+
+        $order->add_order_note( sprintf(
+          "Error Transaction : '%s'",
+          $e->getMessage()
+        ));
+
+        return new WP_Error( 'error', __( 'Error: ' . $e->getMessage(), 'wc-gateway-belugapay' ) );
       }
     }
 
