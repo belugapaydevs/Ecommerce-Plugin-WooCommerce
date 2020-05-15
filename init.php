@@ -145,7 +145,7 @@ function wc_belugapay_gateway_init() {
 
       $cardHolder = array(
         'cardHolder' => array (
-          'name' => $orderData['billing']['first_name'] . ' ' . $orderData['billing']['last_name'],
+          'name' => $_POST['cardHolder'],
           'email' => $orderData['billing']['email'],
           'phone' => '+52' . $orderData['billing']['phone']
         )
