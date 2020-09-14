@@ -71,6 +71,6 @@
 
   <div class="form-row form-row-wide blp-mb">
     <label for="cvv">CVV<span class="required">*</span></label>
-    <input id="cvv" name="cvv" class="input-text" type="text" maxlength="3" />
+    <input id="cvv" name="cvv" class="input-text" type="password" maxlength="3" />
   </div>
 </div>

@@ -12,6 +12,7 @@ class Environment {
           'version' => '0.0.1',
           'apiVersion' => '1.0.44',
           'apiBase' => 'http://transaction-api:8080/api/v2/',
+          'apiBaseCart' => 'https://e7a4f34f2960.ngrok.io/',
         ];
         break;
       case 'production':
@@ -19,6 +20,7 @@ class Environment {
           'version' => '1.0.0',
           'apiVersion' => '1.0.0',
           'apiBase' => 'https://transaction.belugapay.com/api/v2/',
+          'apiBaseCart' => 'https://cart.belugapay.app/',
         ];
         break;
       default:
@@ -26,6 +28,7 @@ class Environment {
           'version' => '1.0.0',
           'apiVersion' => '1.0.0',
           'apiBase' => 'https://transaction.belugapay.com/api/v2/',
+          'apiBaseCart' => 'https://cart.belugapay.app/',
         ];
         break;
     }
