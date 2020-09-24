@@ -92,29 +92,35 @@ class WC_Belugapay_Card_Payment extends WC_Payment_Gateway {
 
     $orderData = $order->get_data();
 
+    $cardHolderText = sanitize_text_field((string) $_POST['cardHolder']);
+    $cardNumber = sanitize_text_field((string) $_POST['cardNumber']);
+    $expirationMonth = sanitize_text_field((string) $_POST['expirationMonth']);
+    $expirationYear = sanitize_text_field((string) $_POST['expirationYear']);
+    $cvv = sanitize_text_field((string) $_POST['cvv']);
+
     $cardHolder = array(
       'cardHolder' => array (
-        'name' => $_POST['cardHolder'],
-        'email' => $orderData['billing']['email'],
-        'phone' => '+52' . $orderData['billing']['phone']
+        'name' => $cardHolderText,
+        'email' => sanitize_text_field((string) $orderData['billing']['email']),
+        'phone' => '+52' . sanitize_text_field((string) $orderData['billing']['phone'])
       )
     );
     $card = array(
       'card' => array (
-        'card' => $_POST['cardNumber'],
-        'expires' => $_POST['expirationMonth'] .'/'. $_POST['expirationYear'],
-        'cvv' => $_POST['cvv'],
+        'card' => $cardNumber,
+        'expires' => $expirationMonth .'/'. $expirationYear,
+        'cvv' => $cvv,
       )
     );
     $address = array(
       'address' => array (
         'country' => 'MX',
-        'state' => $orderData['billing']['state'],
-        'city' => $orderData['billing']['city'],
+        'state' => sanitize_text_field((string) $orderData['billing']['state']),
+        'city' => sanitize_text_field((string) $orderData['billing']['city']),
         'numberExt' => 'NA',
         'numberInt' => '',
-        'zipCode' => $orderData['billing']['postcode'],
-        'street' => $orderData['billing']['address_1'],
+        'zipCode' => sanitize_text_field((string) $orderData['billing']['postcode']),
+        'street' => sanitize_text_field((string) $orderData['billing']['address_1']),
       )
     );
     $metadata = array(
@@ -124,7 +130,7 @@ class WC_Belugapay_Card_Payment extends WC_Payment_Gateway {
     );
     $transaction = array(
       'saleTransaction' => array (
-        'amount' => $orderData['total']
+        'amount' => sanitize_text_field((string) $orderData['total'])
       )
     );
 

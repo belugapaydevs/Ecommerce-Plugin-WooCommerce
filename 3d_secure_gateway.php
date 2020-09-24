@@ -39,20 +39,20 @@ class WC_Belugapay_3dsecure_Payment extends WC_Payment_Gateway {
     $_POST = json_decode(file_get_contents('php://input'), true);
 
     global $woocommerce;
-    $order = new WC_Order( $_POST['request']['metadata']['idOrder'] );
+    $order = new WC_Order( sanitize_text_field((string) $_POST['request']['metadata']['idOrder']) );
     $order->payment_complete();
 
     $woocommerce->cart->empty_cart();
 
-    update_post_meta($order->get_id(), 'transactionId', $_POST['response']['data']['transaction']['transactionId']);
-    update_post_meta($order->get_id(), 'reference', $_POST['response']['data']['transaction']['reference']);
-    update_post_meta($order->get_id(), 'authCode', $_POST['response']['data']['transaction']['authCode']);
+    update_post_meta($order->get_id(), 'transactionId', sanitize_text_field((string) $_POST['response']['data']['transaction']['transactionId']));
+    update_post_meta($order->get_id(), 'reference', sanitize_text_field((string) $_POST['response']['data']['transaction']['reference']));
+    update_post_meta($order->get_id(), 'authCode', sanitize_text_field((string) $_POST['response']['data']['transaction']['authCode']));
 
     $order->add_order_note( sprintf(
       "Transaction Id: %s,<br/>Reference: %s,<br/>Authorization Code: %s",
-      $_POST['response']['data']['transaction']['transactionId'],
-      $_POST['response']['transaction']['reference'],
-      $_POST['response']['transaction']['authCode']
+      sanitize_text_field((string) $_POST['response']['data']['transaction']['transactionId']),
+      sanitize_text_field((string) $_POST['response']['data']['transaction']['reference']),
+      sanitize_text_field((string) $_POST['response']['data']['transaction']['authCode'])
     ));
 
     return true;
