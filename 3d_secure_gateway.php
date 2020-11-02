@@ -148,9 +148,10 @@ class WC_Belugapay_3dsecure_Payment extends WC_Payment_Gateway {
 
     $order_items = wc_get_order( $order_id );
     foreach($order_items->get_items() as $item_id => $item) {
+      $product = $item->get_product();
       $items_data['items'][] = array(
         'name' => $item->get_name(),
-        'price' => $item->get_subtotal(),
+        'price' => $product->get_price(),
         'description' => '',
         'quantity' => $item->get_quantity(),
       );
