@@ -1,13 +1,12 @@
 <?php
 
-namespace BelugaPay;
+namespace EspiralApp;
 
-use \BelugaPay\Token;
-use \BelugaPay\User;
-use \BelugaPay\Commerce;
-use \BelugaPay\Request3D;
+use \EspiralApp\Token;
+use \EspiralApp\Commerce;
+use \EspiralApp\Request3D;
 
-class BelugaPayResource3D
+class EspiralAppResource3D
 {
   protected function createSign($url, $body)
   {
@@ -18,7 +17,7 @@ class BelugaPayResource3D
     ));
     $body = array_merge($body);
 
-    $response = $requestor->request('POST', $url . User::$apiKey, null, $body);
+    $response = $requestor->request('POST', $url, null, $body);
     return $response;
   }
 }

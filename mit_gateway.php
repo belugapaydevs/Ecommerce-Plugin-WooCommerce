@@ -1,16 +1,16 @@
 <?php
 
-class WC_Belugapay_3dsecure_Payment extends WC_Payment_Gateway {
+class WC_Belugapay_santander_Payment extends WC_Payment_Gateway {
 
   public function __construct() {
 
-    $this->id                 = 'belugapay3dsecurepayment';
+    $this->id                 = 'belugapaysantanderpayment';
     $this->icon               = '';
     $this->has_fields         = true;
-    $this->method_title       = __( 'Espiral 3d Secure Payment', 'belugapay3dsecurepayment' );
-    $this->method_description = __( 'Allow payments by credit or debit card, visa or mastercard that are allowed in Mexican' );
+    $this->method_title       = __( 'Espiralapp Santander Payment', 'belugapaysantanderpayment' );
+    $this->method_description = __( 'Allow payments by credit or debit card, Visa, MasterCard or American Express that are allowed in Mexican' );
     $this->enabled            = false;
-    $this->supports           = array( 'products', 'refunds' );
+    $this->supports           = array( 'products' );
     
     // Load the settings.
     $this->init_form_fields();
@@ -29,13 +29,13 @@ class WC_Belugapay_3dsecure_Payment extends WC_Payment_Gateway {
     // Actions
     add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
     add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'thankyou_page' ) );
-    add_action( 'woocommerce_api_securedata', array( $this,'callback_handler_securedata'));
+    add_action( 'woocommerce_api_securedatasantander', array( $this,'callback_handler_securedatasantander'));
     
     // Customer Emails
     add_action( 'woocommerce_email_before_order_table', array( $this, 'email_instructions' ), 10, 3 );
   }
 
-  function callback_handler_securedata() {
+  function callback_handler_securedatasantander() {
     $_POST = json_decode(file_get_contents('php://input'), true);
 
     global $woocommerce;
@@ -47,7 +47,6 @@ class WC_Belugapay_3dsecure_Payment extends WC_Payment_Gateway {
     update_post_meta($order->get_id(), 'transactionId', sanitize_text_field((string) $_POST['response']['data']['transaction']['transactionId']));
     update_post_meta($order->get_id(), 'reference', sanitize_text_field((string) $_POST['response']['data']['transaction']['reference']));
     update_post_meta($order->get_id(), 'authCode', sanitize_text_field((string) $_POST['response']['data']['transaction']['authCode']));
-    update_post_meta($order->get_id(), 'cardType', sanitize_text_field((string) $_POST['response']['data']['transaction']['cardType']));
 
     $order->add_order_note( sprintf(
       "Transaction Id: %s,<br/>Reference: %s,<br/>Authorization Code: %s",
@@ -109,7 +108,7 @@ class WC_Belugapay_3dsecure_Payment extends WC_Payment_Gateway {
   }
 
   public function payment_fields() {
-    include_once('templates/cardPayment3d.php');
+    include_once('templates/cardPaymentSantander.php');
   }
 
   function ecommerceTransaction($order_id, $order) {
@@ -129,7 +128,7 @@ class WC_Belugapay_3dsecure_Payment extends WC_Payment_Gateway {
 
     $cardHolder = array(
       'cardHolder' => array (
-        'name' => $_POST['cardHolder'],
+        'name' => $orderData['billing']['first_name'].' '.$orderData['billing']['last_name'],
         'email' => $orderData['billing']['email'],
         'phone' => '+52' . $orderData['billing']['phone']
       )
@@ -186,14 +185,27 @@ class WC_Belugapay_3dsecure_Payment extends WC_Payment_Gateway {
       'redirectUrl' => $this->redirectSuccess,
       'backPage' => get_bloginfo('url'),
       'redirectData' => array (
-        'url' => get_bloginfo('url') . '/?wc-api=securedata',
+        'url' => get_bloginfo('url') . '/?wc-api=securedatasantander',
         'redirectMethod' => 'POST',
       )
     );
 
-    $response = $cart->sign($cardHolder, $address, $transaction, $items_data, $currency, $redirectUrl, $metadata);
+    $bankingSource = array (
+      'bankingSource' => '2'
+    );
 
-    if (!isset($response['token'])) {
+    $response = $cart->sign(
+      $cardHolder,
+      $address,
+      $transaction,
+      $items_data,
+      $currency,
+      $redirectUrl,
+      $metadata,
+      $bankingSource
+    );
+
+    if (!isset($response['payload']['url'])) {
       throw new Exception('Tarjeta declinada');
     }
 
@@ -205,18 +217,15 @@ class WC_Belugapay_3dsecure_Payment extends WC_Payment_Gateway {
     $order = new WC_Order( $order_id );
 
     try {
-      // file_put_contents(dirname(__FILE__) . '/logs.txt', '21321');
       $response = $this->ecommerceTransaction($order_id, $order);
       if ($response) {
         $order->update_status('on-hold');
 
         $order->save();
 
-        $config = \EspiralApp\Environment::getEnvironment();
-
         return array(
           'result' => 'success',
-          'redirect' => $config['apiBaseCart'] . $response['token']
+          'redirect' => $response['payload']['url']
         );
       }
     } catch (Exception $e) {
@@ -323,7 +332,7 @@ class WC_Belugapay_3dsecure_Payment extends WC_Payment_Gateway {
   }
 
   public function email_instructions( $order, $sent_to_admin, $plain_text = false ) {
-    if ( $this->instructions && ! $sent_to_admin && 'belugapay3dsecurepayment' === $order->payment_method && $order->has_status( 'on-hold' ) ) {
+    if ( $this->instructions && ! $sent_to_admin && 'belugapaysantanderpayment' === $order->payment_method && $order->has_status( 'on-hold' ) ) {
       echo wpautop( wptexturize( $this->instructions ) ) . PHP_EOL;
     }
   }

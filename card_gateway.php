@@ -6,7 +6,7 @@ class WC_Belugapay_Card_Payment extends WC_Payment_Gateway {
     $this->id                 = 'belugapaycardpayment';
     $this->icon               = '';
     $this->has_fields         = true;
-    $this->method_title       = __( 'Belugapay Card Payment', 'belugapaycardpayment' );
+    $this->method_title       = __( 'Espiral Card Payment', 'belugapaycardpayment' );
     $this->method_description = __( 'Allow payments by credit or debit card, visa or mastercard that are allowed in Mexican' );
     $this->enabled            = false;
     $this->supports           = array( 'products', 'refunds' );
@@ -40,7 +40,7 @@ class WC_Belugapay_Card_Payment extends WC_Payment_Gateway {
       'enabled' => array(
         'title'   => __( 'Enable/Disable', 'wc-gateway-belugapay' ),
         'type'    => 'checkbox',
-        'label'   => __( 'Enable belugapay Payment', 'wc-gateway-belugapay' ),
+        'label'   => __( 'Enable Espiral Payment', 'wc-gateway-belugapay' ),
         'default' => 'no'
       ),
       
@@ -79,16 +79,16 @@ class WC_Belugapay_Card_Payment extends WC_Payment_Gateway {
 
   function ecommerceTransaction($order_id, $order) {
     /* Uncomment is only development */
-    // \BelugaPay\Environment::setEnvironment('develop');
-    // \BelugaPay\BelugaPay::init();
+    // \EspiralApp\Environment::setEnvironment('develop');
+    // \EspiralApp\EspiralApp::init();
 
     if ($this->enabledProduction === 'yes') {
-      \BelugaPay\User::setApiKey($this->productionApiKey);
+      \EspiralApp\User::setApiKey($this->productionApiKey);
     } else {
-      \BelugaPay\User::setApiKey($this->sandboxApiKey);
+      \EspiralApp\User::setApiKey($this->sandboxApiKey);
     }
 
-    $sale = new \BelugaPay\Sales();
+    $sale = new \EspiralApp\Sales();
 
     $orderData = $order->get_data();
 
@@ -201,16 +201,16 @@ class WC_Belugapay_Card_Payment extends WC_Payment_Gateway {
 
   function ecommerceTransactionRefund($order_id, $reference) {
     /* Uncomment is only development */
-    // \BelugaPay\Environment::setEnvironment('develop');
-    // \BelugaPay\BelugaPay::init();
+    // \EspiralApp\Environment::setEnvironment('develop');
+    // \EspiralApp\EspiralApp::init();
 
     if ($this->enabledProduction === 'yes') {
-      \BelugaPay\User::setApiKey($this->productionApiKey);
+      \EspiralApp\User::setApiKey($this->productionApiKey);
     } else {
-      \BelugaPay\User::setApiKey($this->sandboxApiKey);
+      \EspiralApp\User::setApiKey($this->sandboxApiKey);
     }
 
-    $cancel = new \BelugaPay\Cancel();
+    $cancel = new \EspiralApp\Cancel();
 
     $cancelTransaction = array(
       'saleTransaction' => array (

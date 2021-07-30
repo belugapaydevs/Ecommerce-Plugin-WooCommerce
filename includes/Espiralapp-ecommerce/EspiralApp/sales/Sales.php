@@ -1,8 +1,8 @@
 <?php 
 
-namespace BelugaPay;
+namespace EspiralApp;
 
-class Sales extends BelugaPayResource
+class Sales extends EspiralAppResource
 {
   public function sale($cardHolder, $card, $address, $transaction, $metadata = [])
   {

@@ -1,8 +1,8 @@
 <?php 
 
-namespace BelugaPay;
+namespace EspiralApp;
 
-class Cancel extends BelugaPayResource
+class Cancel extends EspiralAppResource
 {
   public function cancel($transaction)
   {

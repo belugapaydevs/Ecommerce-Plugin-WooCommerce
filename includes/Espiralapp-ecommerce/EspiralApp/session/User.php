@@ -1,6 +1,6 @@
 <?php 
 
-namespace BelugaPay;
+namespace EspiralApp;
 
 class User
 {

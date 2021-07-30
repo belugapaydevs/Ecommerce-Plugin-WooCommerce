@@ -1,10 +1,10 @@
 <?php
 
-namespace BelugaPay;
+namespace EspiralApp;
 
-use \BelugaPay\Environment;
+use \EspiralApp\Environment;
 
-abstract class BelugaPay
+abstract class EspiralApp
 {
 	public static $apiKey = '';
 	public static $apiBase = '';

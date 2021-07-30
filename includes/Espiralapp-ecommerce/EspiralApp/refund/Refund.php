@@ -1,8 +1,8 @@
 <?php 
 
-namespace BelugaPay;
+namespace EspiralApp;
 
-class Refund extends BelugaPayResource
+class Refund extends EspiralAppResource
 {
   public function refund($transaction)
   {

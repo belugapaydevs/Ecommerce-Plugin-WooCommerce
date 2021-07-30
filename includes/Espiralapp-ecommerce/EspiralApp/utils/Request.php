@@ -1,8 +1,8 @@
 <?php 
 
-namespace BelugaPay;
+namespace EspiralApp;
 
-use \BelugaPay\BelugaPay;
+use \EspiralApp\EspiralApp;
 
 class Request {
 
@@ -18,7 +18,7 @@ class Request {
 
   public static function apiUrl($url = '')
   {
-    $apiBase = BelugaPay::$apiBase;
+    $apiBase = EspiralApp::$apiBase;
     return $apiBase . $url;
   }
 

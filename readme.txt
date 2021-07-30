@@ -1,7 +1,7 @@
-=== Belugapay Checkout Gateway for Woocommerce ===
-Contributors: belugapay
+=== Espiralapp Checkout Gateway for Woocommerce ===
+Contributors: espiralapp
 Tags: comments, spam
-Tags: belugapay, visa, mastercard, payment gateway, mexico
+Tags: espiralapp, visa, mastercard, payment gateway, mexico
 Requires at least: 5.1
 Tested up to: 5.2
 Requires PHP: 7.1

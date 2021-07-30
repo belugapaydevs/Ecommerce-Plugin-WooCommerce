@@ -1,13 +1,13 @@
 <?php
 
-namespace BelugaPay;
+namespace EspiralApp;
 
-use \BelugaPay\Token;
-use \BelugaPay\User;
-use \BelugaPay\Commerce;
-use \BelugaPay\Request;
+use \EspiralApp\Token;
+use \EspiralApp\User;
+use \EspiralApp\Commerce;
+use \EspiralApp\Request;
 
-class BelugaPayResource
+class EspiralAppResource
 {
   protected function sendSale($url, $body)
   {

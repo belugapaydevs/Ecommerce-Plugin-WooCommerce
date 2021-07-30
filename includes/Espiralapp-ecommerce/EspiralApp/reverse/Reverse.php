@@ -1,8 +1,8 @@
 <?php 
 
-namespace BelugaPay;
+namespace EspiralApp;
 
-class Reverse extends BelugaPayResource
+class Reverse extends EspiralAppResource
 {
   public function reverse($transaction)
   {
